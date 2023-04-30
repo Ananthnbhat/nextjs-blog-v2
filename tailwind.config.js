@@ -25,11 +25,13 @@ module.exports = {
         14: '3.5rem',
       },
       fontFamily: {
-        sans: ['InterVariable', ...defaultTheme.fontFamily.sans],
+        sans: ['Wotfard', 'Wotfard-fallback', ...defaultTheme.fontFamily.sans],
       },
       colors: {
-        primary: colors.teal,
+        primary: colors.cyan,
         gray: colors.neutral,
+        dblue: '#0e141b',
+        ldblue: '#151d26',
       },
       typography: (theme) => ({
         DEFAULT: {
