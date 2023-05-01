@@ -4,7 +4,7 @@ date: '2022-02-02'
 tags: ['rendering']
 ---
 
-We recommend using **Static Generation** (with and without data) whenever possible because your page can be built once and served by CDN, which makes it much faster than having a server render the page on every request.
+According to Next Js [docs](https://nextjs.org/learn/basics/data-fetching/two-forms), using **Static Generation** (with and without data) whenever possible is recommended, because your page can be built once and served by CDN, which makes it much faster than having a server render the page on every request.
 
 You can use Static Generation for many types of pages, including:
 
@@ -25,7 +25,7 @@ Client Side Rendering is the traditional way of rendering a page in the browser.
 
 ## SSR
 
-SSR stands for Server Side Rendering. When a user sends a request through the browser, the server receives the request, generates a complete HTML site and returns it to the browser. So, the rendering happens in the server, not in the browser. While server is rendering(generating) the HTML page, a placeholder HTML (a loader animation) can be displayed to the user instead of showing a blank screen, which is what happends in Client Side Rendering.
+SSR stands for Server Side Rendering. When a user sends a request through the browser, the server receives the request, generates a complete HTML site and returns it to the browser. So, the rendering happens in the server, not in the browser. While server is rendering(generating) the HTML page, a placeholder HTML (a loader animation) can be displayed to the user instead of showing a blank screen, which is what happens in Client Side Rendering.
 
 Next.js supports SSR out of the box ([link](https://nextjs.org/docs/advanced-features/react-18/streaming)) whereas in React 18, it can be done with a combination of React.suspense & React.lazy ([link](https://reactjs.org/docs/react-api.html#reactsuspense))
 

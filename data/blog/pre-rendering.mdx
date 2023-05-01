@@ -1,7 +1,22 @@
 ---
 title: 'Two Forms of Pre-rendering'
 date: '2022-03-01'
-tags: ['rendering']
+tags: ['next js', 'rendering']
+---
+
+## What is pre-rendering?
+
+Pre-rendering is generation of the HTML of a page, not by the browser but by a server which is managed by Next js. This takes away the rendering
+work frm the browser, saving memory and decreasing page load time. Once the pre-rendering is completed and bare minimum is shown to the user,
+the "hydration" happens
+
+## What is hydration?
+
+Adding interactivity (JavaScript) to a generated HTML page.
+
+So, in Next js, a bare minimum HTML page is shown to the user (pre-rendering) and then it becomes interactive. Whereas in normal React applications,
+nothing is shown to the user initially, rendering & hydration happens in the browser and then page is shown.
+
 ---
 
 Next.js has two forms of pre-rendering: **Static Generation** and **Server-side Rendering**. The difference is in **when** it generates the HTML for a page.
