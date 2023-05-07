@@ -1,0 +1,117 @@
+---
+title: 'Error boundaries in react'
+date: '2023-05-07'
+lastmod: '2023-05-08'
+tags: ['react', 'error-handling', 'error-boundary']
+# layout: ListLayout
+summary: 'Error boundaries can come in handy if you want to catch unexpected errors in rendering lifecycle.'
+---
+
+<TOCInline toc={props.toc} exclude="Overview" />
+
+## What is an error boundary?
+
+Error boundary is a piece of code that lets you handle any unexpected, unhandled errors during **rendering** process. Errors are caught by the error boundary if and when they are thrown in the children component. Error boundaries allow us to show a fallback UI, instead of
+displaying the raw error to the user.
+
+It is important to note that,
+
+> Error boundaries, as of now, cannot catch error thrown during an `async` task or due to an event handler such as `onClick` 😕.
+
+## How does it work?
+
+Error boundaries are based on a `static` method called [`getDerivedStateFromError`](https://react.dev/reference/react/Component#static-getderivedstatefromerror).
+This method catches any rendering errors thrown by the children components. So, when this method is called, a boolean state can be used to display a custom error message to the users. More about implement in below sections.
+
+## When and where to use it?
+
+Error boundaries can be used to catch errors during rendering lifecycle.
+
+The error boundaries are wrapped around one or more children components, so that when an error is thrown in any of the children components, the error boundary catches and shows a custom error message defined by us.
+
+The error boundary can be re-used for one or more components or it can be used to wrap the whole app like so -
+
+```jsx:App.jsx
+import React from 'react';
+import ErrorBoundary from './components/ErrorBoundary';
+...
+const App = () => {
+  ...
+  ReactDOM.render (
+    <React.StrictMode>
+        <ErrorBoundary>
+            <SomeChildComponent />
+            <AnotherChildComponent />
+        </ErrorBoundary>
+    <React.StrictMode>,
+    document.getElementById('root')
+  );
+}
+```
+
+## How to implement it?
+
+1. React's implementation
+
+[React docs](https://react.dev/reference/react/Component#catching-rendering-errors-with-an-error-boundary) suggest a simple implementation as shown below.
+
+```jsx:components/ErrorBoundary.jsx
+import React from 'react';
+import FallbakUIComponent from './FallbackUIComponent';
+
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error) {
+    // Update state so the next render will show the fallback UI.
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, info) {
+    // for any side effect, when an error is caught
+  }
+
+  render() {
+    if (this.state.hasError) {
+      // You can render any custom fallback UI
+      return <FallbackUIComponent />
+    }
+
+    return this.props.children;
+  }
+}
+```
+
+> The error boundary component has be a class component for it to work.
+
+2. The [react-error-boundary](https://github.com/bvaughn/react-error-boundary) library
+
+The `react-error-boundary` library offers a simpler alternative while internally using almost the same code as above.
+
+```jsx:App.jsx
+import React from 'react';
+import { ErrorBoundary } from "react-error-boundary";
+import FallbackUIComponent from './components/FallbackUIComponent';
+...
+const App = () => {
+  ...
+  const displayFallbackUI = () => <FallbackUIComponent />;
+
+  ReactDOM.render (
+    <React.StrictMode>
+        <ErrorBoundary fallbackRenderer={displayFallbackUI}>
+            <SomeChildComponent />
+            <AnotherChildComponent />
+        </ErrorBoundary>
+    <React.StrictMode>,
+    document.getElementById('root')
+  );
+}
+```
+
+This library requires 1 mandatory prop which is either `fallback`, `fallbackRender` or `FallbackComponent`. Read more about the library in the [documentation](https://github.com/bvaughn/react-error-boundary).
+
+### Edge case - usage with [React router](https://v5.reactrouter.com/web/guides/quick-start)
