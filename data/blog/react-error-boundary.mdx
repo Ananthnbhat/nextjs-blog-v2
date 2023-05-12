@@ -51,7 +51,7 @@ const App = () => {
 
 ## How to implement it?
 
-1. React's implementation
+### 1. React's implementation
 
 [React docs](https://react.dev/reference/react/Component#catching-rendering-errors-with-an-error-boundary) suggest a simple implementation as shown below.
 
@@ -87,7 +87,7 @@ class ErrorBoundary extends React.Component {
 
 > The error boundary component has be a class component for it to work.
 
-2. The [react-error-boundary](https://github.com/bvaughn/react-error-boundary) library
+### 2. The [react-error-boundary](https://github.com/bvaughn/react-error-boundary) library
 
 The `react-error-boundary` library offers a simpler alternative while internally using almost the same code as above.
 
@@ -112,6 +112,121 @@ const App = () => {
 }
 ```
 
-This library requires 1 mandatory prop which is either `fallback`, `fallbackRender` or `FallbackComponent`. Read more about the library in the [documentation](https://github.com/bvaughn/react-error-boundary).
+This library requires 1 mandatory prop which is either `fallback`, `fallbackRender` or `FallbackComponent`. It is also possible to programmatically reset the error boundary using the hook `useErrorBoundary()`. Read more about the library in the [documentation](https://github.com/bvaughn/react-error-boundary).
 
-### Edge case - usage with [React router](https://v5.reactrouter.com/web/guides/quick-start)
+## Edge case - usage with [React router v5](https://v5.reactrouter.com/web/guides/quick-start)
+
+While using react router and navigation is achieved using history object, usually new pages are pushed to the history stack using `history.push(newURL)`. In this scenario, there may be a situation where you want to show a fallback UI (using error boundary) **and** push the fallback UI page to the history stack. If you are using react-error-boundary library, pushing a new page to history stack may not be possible. While racking my brain, I found this useful Github gist which explains how to achieve this and dismiss the error boundary on URL change _after_ an error has occurred. This implementation is based on the [React's implementation](#1-reacts-implementation)
+
+### How it works
+
+1. The ErrorBoundary gets the current location => previous URL is evaluated => key is set to 0 (trackPathChange is false).
+2. When an error occurs, trackPathChange is set to true => this.state.error is true => so fallback UI is shown.
+3. When URL changes, trackPathChange is still true, `previousPathname` != `pathname` => so key is incremented to 1.
+4. When key value changes, the error boundary is reset.
+
+Code source - [Githug gist](https://gist.github.com/donaldpipowitch/1248ca4658506c7c8b481edfbd740ca7), [Codesandbox](https://codesandbox.io/s/react-error-boundary-example-whbpq?file=/src/index.tsx:0-3226)
+
+<details>
+  <summary>Exapnd to see the Code</summary>
+
+```jsx:ErrorBoundary.jsx
+class RealErrorBoundary extends React.Component<
+  { children?: React.ReactNode; setTrackPathChange: (track: boolean) => void },
+  { error: unknown }
+> {
+  state = { error: undefined };
+
+  static getDerivedStateFromError(error: unknown) {
+    return { error };
+  }
+
+  componentDidCatch(error: unknown, info: React.ErrorInfo) {
+    this.props.setTrackPathChange(true);
+  }
+
+  render() {
+    if (this.state.error) {
+      return <p>An unknown error happened.</p>;
+    } else {
+      return this.props.children;
+    }
+  }
+}
+
+// this "fake" error boundary will reset the "real" error boundary
+// whenever a pathname change happens _after_ an error
+const ErrorBoundary: React.FC = ({ children }) => {
+  const [key, setKey] = React.useState(0);
+  const { pathname } = useLocation();
+  const previousPathname = usePrevious(pathname);
+  const [trackPathChange, setTrackPathChange] = React.useState(false);
+
+  React.useEffect(() => {
+    if (trackPathChange && previousPathname !== pathname) {
+      setKey(key => key + 1);
+      setTrackPathChange(false);
+    }
+  }, [trackPathChange, previousPathname, pathname]);
+
+  return (
+    <RealErrorBoundary key={key} setTrackPathChange={setTrackPathChange}>
+      {children}
+    </RealErrorBoundary>
+  );
+};
+```
+
+</details>
+
+### Using react-error-boundary
+
+A simple trick to reset the error boundary is to use the resetErrorBoundary function prop. The main focus is on the logic inside useEffect hook.
+
+```jsx:App.jsx
+import React from 'react';
+import { ErrorBoundary } from "react-error-boundary";
+import FallbackUIComponent from './components/FallbackUIComponent';
+import { BrowserRouter, Switch, Route, useLocation } from 'react-router-dom';
+...
+const App = () => {
+  ...
+  const displayFallbackUI = ({ error, resetErrorBoundary }) => {
+    const location = useLocation();
+    const errorLocation = React.useRef(location.pathname);
+
+    React.useEffect(() => {
+      if(location.pathname !== errorLocation.current){
+        resetErrorBoundary();
+      }
+    })
+
+    return <FallbackUIComponent />;
+    }
+
+  ReactDOM.render (
+    <React.StrictMode>
+        <ErrorBoundary fallbackRender={displayFallbackUI}>
+            <SomeChildComponent />
+            <AnotherChildComponent />
+        </ErrorBoundary>
+    <React.StrictMode>,
+    document.getElementById('root')
+  );
+}
+```
+
+The reason we need the additional logic of resetting the error boundary is to show error boundary only when an error occurs. For any other cases or URLs, we want to see normal behaviour of the application.
+
+## Conclusion
+
+Error boundaries are a powerful way to catch errors during render and show a custom UI to the customers instead of raw error from React. There are 2 simple ways to implement the error boundary - using [React's class](#1-reacts-implementation) and [react-error-boundary library](#2-the-react-error-boundary-library). We also saw how to reset the error boundary when using react-router-dom for routing purposes. The trick is to track or URL change and based on that error boundaries can be reset.
+
+---
+
+## Sources
+
+- [reset error boundary using the key prop](https://codesandbox.io/s/zealous-darkness-pl2mif?file=/src/Layout.js)
+- [Stack overflow](https://stackoverflow.com/a/71877172/8676892)
+- [react-error-boundary](https://www.npmjs.com/package/react-error-boundary)
+- [react docs](https://react.dev/reference/react/Component#catching-rendering-errors-with-an-error-boundary)
