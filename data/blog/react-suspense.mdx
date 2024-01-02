@@ -106,9 +106,9 @@ const App = () => {
 }
 ```
 
-When the date value is updated by the user, the deferredDate still has the older value of the date since we have chosen to ignore new date for a while
-(as we have used useDeferredValue hook). So, once the page re-renders (due to setDate()), deferredDate still has the old date. Then react tries to re-render again to show the
-new date. If this 2nd re-renderig is successful then the deferredDate will have the new date value that is passd to the `<MenuBasedOnDate />` component.
+When the date value is updated by the user, the `deferredDate` still has the older value of the date since we have chosen to ignore new date for a while
+(as we have used `useDeferredValue` hook). So, once the page re-renders (due to `setDate()`), `deferredDate` still has the old date. Then react tries to re-render again to show the
+new date. If this 2nd re-renderig is successful then the `deferredDate` will have the new date value that is passd to the `<MenuBasedOnDate />` component.
 
 > Note that useDeferredValue only supports primitive values to be deferred.
 
