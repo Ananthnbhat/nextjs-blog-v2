@@ -1,5 +1,5 @@
 ---
-title: 'Show fallback UI while component load'
+title: 'Show fallback UI while a React component loads'
 date: '2023-12-06'
 lastmod: '2024-01-01'
 tags: ['react', 'ux']
@@ -79,12 +79,6 @@ const App = () => {
 In the above example, the `<LazyLoadedComponent />` is only loaded when `<App />` is getting rendered. While the lazy component is getting loaded,
 it will be in a suspended state and hence the fallback UI `<Loading />` will be shown to the user.
 
-## Things to note
-
-- Suspense component can be wrapped around multiple nested component. This also means that the fallback UI will be visible until every children loads.
-- The closest parent Suspense component gets activated if a child suspends, meaning there can be multiple Suspense components but only the closest parent component matters
-  for the loading children node.
-
 ## Show the stale state instead of fallback UI
 
 Sometimes, we may want to show the previous state of a component while its loading, instead of showing the fallback UI. For example, assume there is a menu for a restaurat which changes based
@@ -114,14 +108,104 @@ const App = () => {
 
 When the date value is updated by the user, the deferredDate still has the older value of the date since we have chosen to ignore new date for a while
 (as we have used useDeferredValue hook). So, once the page re-renders (due to setDate()), deferredDate still has the old date. Then react tries to re-render again to show the
-new date. If this 2nd re-renderig is successful then the deferredDate will have the new date value that is passd to the `<MenuBasedOnDate />` component
+new date. If this 2nd re-renderig is successful then the deferredDate will have the new date value that is passd to the `<MenuBasedOnDate />` component.
+
+> Note that useDeferredValue only supports primitive values to be deferred.
+
+## Show the stale state instead of fallback UI AND make the state update non-blocking
+
+If there is any instance where we want to make a state update non-blocking, then we can use [`useTransition`](https://react.dev/reference/react/useTransition) hook or `startTransition` function to tell React that a particular
+state update should be non-blocking. Meaning, we are saying that the state update is not update and hence if there is any other state update (or something that causes page
+re-render) then the transitioned state update can be deferred.
+In short, if there are 2 re-renders happening in quick succession, then the first re-render is de-prioritised if it was made as a transition.
+Taking the similar example from before,
+
+```jsx:App.jsx
+import React, {useState, useTransition, Suspense} from 'react';
+...
+const App = () => {
+  ...
+  const [isPending, startTransition] = useTransition();
+  const [date, setDate] = useState('');
+  const [sortby, setSortBy] = useState('asc');
+  const changeSorting = () => {
+    startTransition(()=>{
+      setSortBy(prevState === 'asc' ? 'desc' : 'asc')
+    })
+  }
+  return (
+    <>
+      <label>
+        Search flights:
+        <input value={date} onChange={e => setDate(e.target.value)} />
+        <button onClick={changeSorting}>toggle sorting</button>
+      </label>
+      <Suspense fallback={<h2>Loading...</h2>}>
+        <MenuBasedOnDate latestDate={date} sortBy={sortBy} />
+      </Suspense>
+    </>
+  );
+}
+```
+
+In the above example, if user clicks the button to change the sort and then quickly changes date, then the state update for date is executed, as sorting state update
+is non-blocking & not urgent. This helps avoid hiding already displayed data.
+
+The `isPending` flag can be used to display an alternate UI. So, the control of showing fallback UI is with whoever has access to this flag.
+
+The `useTransition` contains `startTransition` function as you can see in the above example. If we need `isPending` flag, we can use `useTransition`, otherwise use the `startTransition`
+function directly.
+
+> The difference between `useDeferredValue` and `useTransition` is that the former defers a primitive value whereas the latter defers a state update.
+
+So, when do we use Suspense, startTransition or both together? Here is a very good [use case example.](https://github.com/reactwg/react-18/discussions/94#discussioncomment-1406166)
+
+<details>
+  <summary>You can also read the copied excerpt here</summary>
+
+The suspense and APIs are designed for different use cases and can absolutely be used together. There are two kinds of scenarios at play:
+
+- Load - when you initially load data on an unloaded page (ex. navigating to a new page). Suspense is a way to specify fallbacks instead of content, so it should used in this case.
+- Refresh - when you load new data on a page that has already loaded (ex. tab navigations or pull to refresh interactions). In this case, it's bad to hide something the user has already seen because it's disruptive. In this case, startTransition lets you avoid retriggering Suspense boundaries that have already been shown, so you can avoid replacing existing UI with a fallback.
+
+For example, consider an App with a Homefeed and a Profile page. The app is wrapped in a Suspense boundary with a loading spinner fallback. When you first load the Homefeed, we will initially render a loading spinner while the page waits for data. If you then navigate from Homefeed to Profile:
+
+- Without startTransition, Suspense will blow away the already loaded Homefeed page and show the loading spinner again while we wait for Profile data, which is a disruptive user experience.
+- With startTransition, we can avoid retriggering the Suspense fallback boundary and keep showing the Homefeed page (possibly, with some separate indicator) until we get the initial Profile data.
+
+Because startTransition only avoids retriggering Suspense boundaries, new Suspense boundaries will still be shown. This is because we don't want to make users wait until we've fetched all new data to see content.
+
+So in the example above, if you have a Suspense boundary around your friends list in the Profile page, users can view the rest of the page while the friends list loads.
+
+</details>
+You can also read it here
+
+## Things to note
+
+- Suspense component can be wrapped around multiple nested component. This also means that the fallback UI will be visible until every children loads.
+- The closest parent Suspense component gets activated if a child suspends, meaning there can be multiple Suspense components but only the closest parent component matters
+  for the loading children node.
+- The fallback UI can be overridden, meaning when a child component suspends fallback UI is not used, only by the hooks - `useDeferredValue` or `useTransition`
+  (startTransition function).
 
 ## Caveats
 
+1. The `useTransition` has [caveats](https://react.dev/reference/react/useTransition#starttransition-caveats).
+2. The `useDeferredValue` has [caveats](https://react.dev/reference/react/useDeferredValue#caveats).
+
 ## Conclusion
+
+The Suspense react comopnent is a good way to smoothen the user experience by showing an alternate UI while a page or some part of the page is getting updated.
+This lets the user know that the app is still working and doing a particular task in the background while also avoiding the jarring experience of suddenly changing the
+UI or not showing any information regarding whats responsible for loading or refreshing.
 
 ---
 
 ## Sources
 
 - [React docs](https://react.dev/reference/react/Suspense)
+- [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+- [use hook](https://react.dev/reference/react/use)
+- [code splitting](https://developer.mozilla.org/en-US/docs/Glossary/Code_splitting)
+- [useDeferredValue](https://react.dev/reference/react/useDeferredValue)
+- [useTransition](https://react.dev/reference/react/useTransition)
