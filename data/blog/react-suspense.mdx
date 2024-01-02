@@ -81,7 +81,7 @@ it will be in a suspended state and hence the fallback UI `<Loading />` will be 
 
 ## Show the stale state instead of fallback UI
 
-Sometimes, we may want to show the previous state of a component while its loading, instead of showing the fallback UI. For example, assume there is a menu for a restaurat which changes based
+Sometimes, we may want to show the previous state of a component while its loading a fresh state, instead of showing the fallback UI. For example, assume there is a menu for a restaurant which changes based
 on the date. If the date input is modified, then we can keep showing the previous menu until the new menu is fetched & loaded. This can be achieved using
 a react hook called [useDeferredValue](https://react.dev/reference/react/useDeferredValue) as shown below -
 
@@ -110,14 +110,15 @@ When the date value is updated by the user, the `deferredDate` still has the old
 (as we have used `useDeferredValue` hook). So, once the page re-renders (due to `setDate()`), `deferredDate` still has the old date. Then react tries to re-render again to show the
 new date. If this 2nd re-renderig is successful then the `deferredDate` will have the new date value that is passd to the `<MenuBasedOnDate />` component.
 
-> Note that useDeferredValue only supports primitive values to be deferred.
+> Note that `useDeferredValue` only supports primitive values to be deferred.
 
 ## Show the stale state instead of fallback UI AND make the state update non-blocking
 
 If there is any instance where we want to make a state update non-blocking, then we can use [`useTransition`](https://react.dev/reference/react/useTransition) hook or `startTransition` function to tell React that a particular
-state update should be non-blocking. Meaning, we are saying that the state update is not update and hence if there is any other state update (or something that causes page
-re-render) then the transitioned state update can be deferred.
+state update should be non-blocking. Meaning, the state update is not urgent and hence if there is any other new state update (or something that causes page
+re-render) then the previous transitioned state update can be deferred.
 In short, if there are 2 re-renders happening in quick succession, then the first re-render is de-prioritised if it was made as a transition.
+
 Taking the similar example from before,
 
 ```jsx:App.jsx
