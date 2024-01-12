@@ -1,0 +1,142 @@
+---
+title: 'Spring boot essentials - annotations part 1'
+date: '2023-12-27'
+lastmod: '2024-01-05'
+tags: ['java', 'spring-boot']
+# layout: ListLayout
+summary: 'A random list of keywords and their meanings in the spring boot world - part 1'
+---
+
+<TOCInline toc={props.toc} exclude="Overview" />
+
+## Dependency injection: Field vs Constructor
+
+Option A: Constructor injection (preferred):
+
+```java:FileUpload.java
+@Component
+public class FileUpload {
+    private final StorageService storageService;
+
+    @Autowired
+    public FileUploadController(StorageService storageService) {
+        this.storageService = storageService;
+    }
+}
+```
+
+Option B: Field injection:
+
+```java:FileUpload.java
+@Component
+public class FileUpload {
+    @Autowired private StorageService storageService;
+}
+```
+
+Although option A has more code, it provides better readability and also forces anyone using the `FileUpload` to define StorageService without fail. The option B can lead to null pointer exception as
+FileUpload can be used without defining storageService as below:
+
+```java
+FileUpload fileUpload = new FileUpload();
+```
+
+## RestController vs Controller annotations
+
+Both are synonymous to `@Component` but with the meaning that both are used as controllers that act as request receivers for the server.
+The RestController is a specialized version of Controller annotation in which it combines Controller & ResponseBody annotations as below:
+
+```java
+@RestController
+@RequestMapping("files")
+public class SomeController {
+
+  @GetMapping
+  public String returnFileName(@PathVariable int id) {
+    return "a file name";
+  }
+}
+```
+
+```java
+@Controller
+@RequestMapping("files")
+public class SomeController {
+
+  @GetMapping
+  public @ResponseBody String returnFileName(@PathVariable int id) {
+    return "a file name";
+  }
+}
+```
+
+## ConfigurationProperties vs Configuration annotations
+
+`@Configuration` is a annotation used on a class. The class should have methods annotated with `@Bean` annotation.
+The `@Bean` annotation means that the object returned by the method is completely handled by Spring IoC container (instantiation, configuration, initialization). `@Bean` annotated methods are most often used with `@Configuration` annotated classes. A `@Bean` is [singleton scoped](https://docs.spring.io/spring-framework/reference/core/beans/factory-scopes.html) by default.
+The `@Configuration` annotated class indicates its purpose -> to house `@Bean` definitions.
+
+`@ConfigurationProperties` is used on a class to indicate that the class is managed by Spring IoC container. It is also tells spring to bring the values of the defined objects from external source (ex. application.properties)
+
+### `@Configuration` example:
+
+```java:AppConfig.java
+@Configuration
+public class AppConfig {
+
+	@Bean
+	public BeanOne beanOne() {
+		return new BeanOne(beanTwo());
+	}
+
+	@Bean
+	public BeanTwo beanTwo() {
+		return new BeanTwo();
+	}
+}
+
+```
+
+### `@ConfigurationProperties` example:
+
+```java:StorageProperties.java
+@ConfigurationProperties("storage")
+public class StorageProperties {
+    private String location = "upload-dir";
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+}
+```
+
+Requires enabling in the main method:
+
+```java:MainApp.java
+@SpringBootApplication
+@EnableConfigurationProperties(StorageProperties.class)
+public class MainApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(MainApp.class, args);
+    }
+}
+```
+
+Then externally define the value:
+
+```properties:application.properties
+storage.location=D://myDir
+```
+
+---
+
+## Sources
+
+- [Why field injection is evil by Oliver Drotbohm](https://odrotbohm.de/2013/11/why-field-injection-is-evil/)
+- [@Configuration documentation](https://docs.spring.io/spring-framework/reference/core/beans/java/configuration-annotation.html)
+- [use case for @ConfigurationProperties](https://spring.io/guides/gs/uploading-files/)
