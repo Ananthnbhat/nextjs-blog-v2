@@ -133,6 +133,55 @@ Then externally define the value:
 storage.location=D://myDir
 ```
 
+## SpringBootTest, AutoConfigureMockMvc, MockBean annotations
+
+These are some of the annotations used for testing purposes.
+The `@SpringBootTest` annotation is used on top of the test class when the tests in that class require the beans, configurations etc (application context) that a production
+deployed application would use.
+
+The external configuration used by the application context can be differentiated using either `@ActiveProfiles("test")` or `@TestPropertySource(locations = "/application.properties")`.
+
+Sometimes, `@SpringBootTest` may be a overkill if we are testing a small part of the application which doesn't require as many auto configurations. Spring
+provides [test slices](https://docs.spring.io/spring-boot/docs/current/reference/html/test-auto-configuration.html) for this situation. For example,
+the `@WebMvcTest` lets us test the web layer (controller) of the application. Similarly, `@DataJpaTest` does the configuration (entities, repo & DB setup)
+required to test the persistence layer.
+
+`@AutoConfigureMockMvc` adds `MockMvc` to the application context. This MockMvc can be used to perform HTTP actions on the application. For example,
+
+```java
+User user = new User("Ananth", "email@email.com", "0491111111");
+mockMvc.perform(post("/api/{applicationId}/register", 42L)
+            .contentType("application/json")
+            .param("setAsImp", "true")
+            .content(objectMapper.writeValueAsString(user)))
+            .andExpect(status().isOk());
+```
+
+Above code performs a `POST` http request. After this, we can do assertions on the outcome of this request.
+
+The `@MockBean` annotation is used to mock a bean (class) & add it to the application context. For example, a repository can be mocked to return an intended response:
+
+```java
+@SpringBootTest
+class BusinessTest {
+  @MockBean
+  private UserRepository userRepository;
+
+  @Test
+  void someTest() {
+    User user = new User("Ananth", "email@email.com", "0491111111");
+    given(userRepository.save(any(User.class))).willReturn(user);
+
+  }
+}
+```
+
+### Miscellaneous
+
+An application context is synonymous to spring ioc container responsible for Bean management.
+
+A Bean is an object that is completely controlled (instantiation, initialization, injection, etc) by Spring framework.
+
 ---
 
 ## Sources
@@ -140,3 +189,6 @@ storage.location=D://myDir
 - [Why field injection is evil by Oliver Drotbohm](https://odrotbohm.de/2013/11/why-field-injection-is-evil/)
 - [@Configuration documentation](https://docs.spring.io/spring-framework/reference/core/beans/java/configuration-annotation.html)
 - [use case for @ConfigurationProperties](https://spring.io/guides/gs/uploading-files/)
+- [SpringBootTest annotation](https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/test/context/SpringBootTest.html)
+- [AutoConfigureMockMvc annotation](https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/test/autoconfigure/web/servlet/AutoConfigureMockMvc.html)
+- [MockBean annotation](https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/test/mock/mockito/MockBean.html)
