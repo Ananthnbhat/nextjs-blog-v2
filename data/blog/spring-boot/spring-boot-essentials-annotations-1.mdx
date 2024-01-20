@@ -1,7 +1,7 @@
 ---
 title: 'Spring boot essentials - annotations part 1'
 date: '2024-01-12'
-lastmod: '2024-01-14'
+lastmod: '2024-01-20'
 tags: ['java', 'spring-boot']
 # layout: ListLayout
 summary: 'A random list of keywords and their meanings in the spring boot world - part 1'
@@ -176,6 +176,25 @@ class BusinessTest {
 }
 ```
 
+## Component vs Bean annotation
+
+The Bean annotation is used on a method inside Configuration annotated class whereas a Component annotation is used on top of a class.
+
+When do we use Bean annotations?
+
+- When we need a method's result to be saved in the ApplicationContext.
+- When we need to modify logic of a method coming from an external library whose code is not in our control.
+- Similar to the above, when we need to separate the method definition from the class where its defined (decoupling of method from class)
+- When we need verbose definition of a bean -> class is annotated with `@Configuration` and methods are annotated with `@Bean`.
+
+When do we use Component annotation?
+
+- When a class is in our control (not a 3rd party library) & editable.
+- When we want to store a class as a bean in ApplicationContext.
+- When we don't want to decouple a class from its methods.
+- When we don't need verbose definition of a bean -> class is annotated with `@Component`.
+- When we need Spring to recognize a class as a whole as one bean using `@ComponentScan` with path of parent folder of these classes.
+
 ### Miscellaneous
 
 An application context is synonymous to spring ioc container responsible for Bean management.
@@ -192,3 +211,4 @@ A Bean is an object that is completely controlled (instantiation, initialization
 - [SpringBootTest annotation](https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/test/context/SpringBootTest.html)
 - [AutoConfigureMockMvc annotation](https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/test/autoconfigure/web/servlet/AutoConfigureMockMvc.html)
 - [MockBean annotation](https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/test/mock/mockito/MockBean.html)
+- [Spring component annotation](https://www.baeldung.com/spring-component-annotation)
