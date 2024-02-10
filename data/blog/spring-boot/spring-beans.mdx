@@ -143,6 +143,15 @@ public class ClassBUsesClassA {
 
 ## Customizing a bean
 
+### Lifecycle callbacks
+
+There are 2 spring boot annotations that can,
+
+1. execute some logic right after a bean is initialized by the ApplicationContext and properties have been set - `@PostConstruct`
+2. execute logic just before the bean gets discarded by ApplicationContext - `@PreDestroy`
+
+More about these 2 annotations explained [here](./spring-boot-essentials-annotations-1#postconstruct-vs-predestroy-annotation).
+
 ---
 
 ## Sources

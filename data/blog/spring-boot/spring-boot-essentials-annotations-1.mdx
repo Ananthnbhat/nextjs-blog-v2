@@ -1,7 +1,7 @@
 ---
 title: 'Spring boot essentials - annotations part 1'
 date: '2024-01-12'
-lastmod: '2024-01-20'
+lastmod: '2024-02-10'
 tags: ['java', 'spring-boot']
 # layout: ListLayout
 summary: 'A random list of keywords and their meanings in the spring boot world - part 1'
@@ -195,9 +195,51 @@ When do we use Component annotation?
 - When we don't need verbose definition of a bean -> class is annotated with `@Component`.
 - When we need Spring to recognize a class as a whole as one bean using `@ComponentScan` with path of parent folder of these classes.
 
+## PostConstruct vs PreDestroy annotation
+
+The PostConstruct annotation is defined on top of a method where we want to run some logic right after a Bean gets initialized by ApplicationContext. Here the Bean can be a class annotated with stereotype annotation such as
+`@Component`, for example:
+
+```java
+@Component
+public class InitDatabase {
+
+    @Autowired
+    private UserRepository userRepository;
+// add users to DB after the Bean InitDatabase gets initialized by ApplicationContext
+    @PostConstruct
+    private void postConstruct() {
+        User admin = new User("admin", "adminpswd");
+        User normalUser = new User("user", "pswd");
+        userRepository.save(admin, normalUser);
+    }
+}
+```
+
+If the Bean is defined inside a `@Configuration` annotated class, then we cannot define `@PostConstruct` annotated method inside that class. For reasons [refer this issue](https://github.com/spring-projects/spring-framework/issues/27876). So, we have to define it inside the class that is returned by the Bean as shown [in this example](https://www.digitalocean.com/community/tutorials/spring-postconstruct-predestroy#spring-postconstruct-and-predestroy-example).
+
+Another example where assume that CachingMovieLister is returned by a method annotated with `@Bean`,
+
+```java
+public class CachingMovieLister {
+
+	@PostConstruct
+	public void populateMovieCache() {
+		// populates the movie cache upon initialization...
+	}
+
+	@PreDestroy
+	public void clearMovieCache() {
+		// clears the movie cache upon destruction...
+	}
+}
+```
+
+Similar to PostConstruct, PreDestroy annotated method can be used to execute a logic can runs just before a bean is discarded by ApplicationContext.
+
 ### Miscellaneous
 
-An application context is synonymous to spring ioc container responsible for Bean management.
+An application context (ApplicationContext) is synonymous to spring ioc container responsible for Bean management.
 
 A Bean is an object that is completely controlled (instantiation, initialization, injection, etc) by Spring framework.
 
@@ -212,3 +254,4 @@ A Bean is an object that is completely controlled (instantiation, initialization
 - [AutoConfigureMockMvc annotation](https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/test/autoconfigure/web/servlet/AutoConfigureMockMvc.html)
 - [MockBean annotation](https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/test/mock/mockito/MockBean.html)
 - [Spring component annotation](https://www.baeldung.com/spring-component-annotation)
+- [Using @PostConstruct and @PreDestroy](https://docs.spring.io/spring-framework/reference/core/beans/annotation-config/postconstruct-and-predestroy-annotations.html)
