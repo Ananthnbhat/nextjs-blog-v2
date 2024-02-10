@@ -167,7 +167,7 @@ So, when do we use Suspense, startTransition or both together? Here is a very go
 The suspense and APIs are designed for different use cases and can absolutely be used together. There are two kinds of scenarios at play:
 
 - Load - when you initially load data on an unloaded page (ex. navigating to a new page). Suspense is a way to specify fallbacks instead of content, so it should used in this case.
-- Refresh - when you load new data on a page that has already loaded (ex. tab navigations or pull to refresh interactions). In this case, it's bad to hide something the user has already seen because it's disruptive. In this case, startTransition lets you avoid retriggering Suspense boundaries that have already been shown, so you can avoid replacing existing UI with a fallback.
+- Refresh - when you load new data on a page that has already loaded (ex. tab navigation or pull to refresh interactions). In this case, it's bad to hide something the user has already seen because it's disruptive. In this case, startTransition lets you avoid retriggering Suspense boundaries that have already been shown, so you can avoid replacing existing UI with a fallback.
 
 For example, consider an App with a Homefeed and a Profile page. The app is wrapped in a Suspense boundary with a loading spinner fallback. When you first load the Homefeed, we will initially render a loading spinner while the page waits for data. If you then navigate from Homefeed to Profile:
 
@@ -196,7 +196,7 @@ So in the example above, if you have a Suspense boundary around your friends lis
 
 ## Conclusion
 
-The Suspense react comopnent is a good way to smoothen the user experience by showing an alternate UI while a page or some part of the page is getting updated.
+The Suspense react component is a good way to smoothen the user experience by showing an alternate UI while a page or some part of the page is getting updated.
 This lets the user know that the app is still working and doing a particular task in the background while also avoiding the jarring experience of suddenly changing the
 UI or not showing any information regarding whats responsible for loading or refreshing.
 

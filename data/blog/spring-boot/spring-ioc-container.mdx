@@ -1,5 +1,5 @@
 ---
-title: 'Spring IoC container (draft)'
+title: 'Spring IoC container'
 tags: ['spring', 'spring-boot']
 date: '2024-01-20'
 lastmod: '2024-01-20'
@@ -8,6 +8,8 @@ summary: ''
 ---
 
 <TOCInline toc={props.toc} />
+
+This article is in-progress...
 
 ## Overview
 
@@ -25,7 +27,7 @@ To summarize,
 - Beans are the objects that we want ApplicationContext to manage (initialization, instantiation, configuration & management)
 - Beans get stored in the ApplicationContext.
 - The configuration metadata defined by a developer acts as instructions to ApplicationContext on how to manage the beans.
-- The configuration metadata can be defines either using traditional xml or java based configuration such as spring boot annotations. Typical example - defining beans using `@Bean` annotated functions within `@Configuration` annotated classes.
+- The configuration metadata can be defined either using traditional xml or java based configuration such as spring boot annotations. Typical example - defining beans using `@Bean` annotated functions within `@Configuration` annotated classes.
 
 It is possible to read the value of a bean stored in context using `context.getBean("beanName", BeanClassName.class);`.
 
