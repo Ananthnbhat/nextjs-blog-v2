@@ -1,0 +1,188 @@
+---
+title: 'React basic concepts'
+date: '2024-07-01'
+lastmod: '2024-07-05'
+tags: ['react']
+# layout: ListLayout
+summary: 'Concepts taken from joyofreact.com'
+---
+
+<TOCInline toc={props.toc} exclude="Overview" />
+
+## What is a react element?
+
+It is the description of the markup we want to create and show it to the user on a browser.
+
+Fro example, below is a paragraph react element.
+
+```jsx
+const element = React.createElement(
+  'p',
+  {
+    id: 'hello',
+  },
+  'Hello World!'
+)
+```
+
+## Most basic structure of react js app.
+
+```jsx
+// index.js
+import React from 'react'
+import { createRoot } from 'react-dom/client'
+
+//// Old way:
+// const element = React.createElement(
+//   'p',
+//   {
+//     id: 'hello',
+//   },
+//   'Hello World!'
+// );
+
+// New way:
+const element = <p id="hello">Hello World!</p>
+
+const container = document.querySelector('#root')
+const root = createRoot(container)
+root.render(element)
+```
+
+```html
+<!-- index.html -->
+<html>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
+```
+
+1. We import the core library, `React`, and the web specific library `react-dom`. (there are other platform libraries such as `react-native`)
+2. The old way to creating a react element is shows us the syntax of a react element:
+   - the type of react element.
+   - properties being set to this element.
+   - content of this element - this could be another react element, which created a tree of elements.
+     The react element actually is a javascript object which looks like this:
+
+```js
+{
+  type: "p",
+  key: null,
+  ref: null,
+  props: {
+    id: 'hello',
+    children: 'Hello World!',
+  },
+  _owner: null,
+  _store: { validated: false }
+}
+```
+
+The new way of creating a react element is via `jsx` syntax, which gets transpiled (converting 1 high level language to another high level language) to javascript.
+This is because jsx is the easier & faster alternative to create react elements compared to the pure javascript method.
+
+3. Finally, we render the application:
+   - get the div with root selector.
+   - declare that this is the root of the application.
+   - render (insert or append) our react element inside the root: convert react elements to DOM nodes. This means, the Javascript description
+     of the HTML element (a react element) gets converted to a DOM node.
+
+### What is a DOM (Document Object Model)
+
+DOM is what gets shown to the user when they visit a website. Its what the browser understands about how to show a website.
+A react app gets finally converted to HTML and the HTML turns into DOM in the browser. DOM is a document with a structure of a tree.
+Each branch of the tree ends with a node. Each node has JS objects which can be programmatically accessed to change its content, style or interactivity by attaching event handlers to them.
+
+React interacts with the DOM via javascript. The conversion flow is as below:
+
+> react (jsx) elements -> transpiled to javascript -> creates/appends HTML elements -> converted to DOM nodes in the browser.
+
+## Compile time vs run time
+
+Compile time is the code processing that happens during compilation. For example, the react code (jsx) getting converted to JS is called transpilation (generally called compilation).
+The processing that happens when the react code gets rendered and some function runs, is called run time - it is the code execution that happens in the browser when the application runs.
+
+## What is a react component?
+
+Everything in an react app is a component. A component is a bundle of text, styles, interactivity which make up a specific part of UI content for a user.
+
+## What is a react fragment?
+
+It is a react component used to group elements together that doesn't produce a DOM node.
+
+```jsx
+<>
+  <OneChild />
+  <AnotherChild />
+</>
+```
+
+source: https://react.dev/reference/react/Fragment
+
+## Control flow operator (&&)
+
+This is also called as short circuit operator, used as an alternative to if-else statement in jsx. The thing we need to make sure while using this kind of `expression` is that the left side
+of the `&&` always gets evaluated to a boolean value.
+For example, both of the below examples do the statement
+
+```jsx
+// with &&
+function Friend({ name, isOnline }) {
+  return (
+    <li className="friend">
+      {isOnline && <div className="green-dot" />}
+      {name}
+    </li>
+  )
+}
+```
+
+```jsx
+// without &&
+function Friend({ name, isOnline }) {
+  let prefix
+  if (isOnline) {
+    prefix = <div className="green-dot" />
+  } else {
+    // in this case prefix is false, so nothing gets rendered.
+    prefix = isOnline
+  }
+
+  return (
+    <li className="friend">
+      {prefix}
+      {name}
+    </li>
+  )
+}
+```
+
+## Visibility toggling
+
+If we want to toggle the visibility of an element, we could use 2 approaches:
+
+1. Conditional rendering: this method only creates & inserts DOM node if condition evaluates to true. So, there is less memory consumption as not every DOM node is created. But
+   if the condition evaluates to true, then the DOM node needs to be created every time.
+2. CSS property: this method hides the element using CSS. So, every DOM node gets created during rendering, so there is higher memory consumption comparatively. But this
+   makes the process of toggling faster as there is no need to create DOM node every time its toggled.
+
+## Reconciliation
+
+React takes a snapshot every time it renders. During next render it compares the elements with the previous render (snapshot) to see what has changed and it updates the only the changed DOM elements.
+This way te whole DOM is not re-created.
+
+## Rendering vs Painting
+
+Re-render happens during Reconciliation process where it finds the differences and edits the DOM. Re-painting is where it takes the changed DOM elements and paints it on the browser for the user.
+Not all re-renders require re-painting. If nothing has changed between snapshots then there is no need of re-painting.
+
+---
+
+## Sources
+
+- [joyofreact](https://joyofreact.com).
+
+```
+
+```
