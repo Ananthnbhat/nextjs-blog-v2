@@ -1,7 +1,7 @@
 ---
 title: 'React basic concepts'
 date: '2024-07-01'
-lastmod: '2024-07-05'
+lastmod: '2024-07-06'
 tags: ['react']
 # layout: ListLayout
 summary: 'Concepts taken from joyofreact.com'
@@ -177,12 +177,15 @@ This way te whole DOM is not re-created.
 Re-render happens during Reconciliation process where it finds the differences and edits the DOM. Re-painting is where it takes the changed DOM elements and paints it on the browser for the user.
 Not all re-renders require re-painting. If nothing has changed between snapshots then there is no need of re-painting.
 
+## Synthetic events in React
+
+When an react element is bound to an event handler, it propagates the event to the handler. This event is not the standard event of Javascript. React maps its own event object
+to the Javascript events while fixing some of the browser inconsistencies & including additional features. The real JS event can be accessed using `event.nativeEvent`.
+
+More on this from React docs: https://react.dev/reference/react-dom/components/common#react-event-object.
+
 ---
 
 ## Sources
 
 - [joyofreact](https://joyofreact.com).
-
-```
-
-```
