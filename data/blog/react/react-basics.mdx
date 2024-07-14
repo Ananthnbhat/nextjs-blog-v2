@@ -122,9 +122,10 @@ source: https://react.dev/reference/react/Fragment
 
 ## Control flow operator (&&)
 
-This is also called as short-circuit operator, used as an alternative to if-else statement in jsx. The thing we need to make sure while using this kind of `expression` is that the left side
+This is also called as short-circuit operator, used as an alternative to if-else statement in jsx. What we need to make sure while using this kind of `expression` is that the left side
 of the `&&` always gets evaluated to a boolean value.
-For example, both of the below examples do the statement
+
+For example, both of the below examples do the same
 
 ```jsx
 // with &&
@@ -170,7 +171,7 @@ If we want to toggle the visibility of an element, we could use 2 approaches:
 ## Reconciliation
 
 React takes a snapshot every time it renders. During next render it compares the elements with the previous render (snapshot) to see what has changed and it updates the only the changed DOM elements.
-This way te whole DOM is not re-created.
+This way the whole DOM is not re-created.
 
 ## Rendering vs Painting
 
