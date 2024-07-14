@@ -221,8 +221,8 @@ the index may change if the list is modified. Its not a good idea of use `Math.r
 When you set state in react, it will re-render only if the value has changed? No, react compares the current value & previous value using referential equality (think about const image).
 If the value has same reference, it won't re-render. If it has new reference it will re-render.
 
-Primitive values are immutable, so when you set state, the state has a new value with new reference, so there is a re-render. Whereas non-primitive values are mutable, so when you set state,
-the value should not be mutated, instead set a new value to the state. This way a new reference gets created for that state value and re-render occurs.
+Primitive values are immutable, so when you set state, the state has a new value with new reference, so there is a re-render. Whereas non-primitive values are mutable, so when you set state, it doesn't change the reference.
+So, the value should not be mutated, instead set a new value to the state. This way a new reference gets created for that state value and re-render occurs.
 
 For an array:
 
