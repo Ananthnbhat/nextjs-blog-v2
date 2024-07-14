@@ -122,7 +122,7 @@ source: https://react.dev/reference/react/Fragment
 
 ## Control flow operator (&&)
 
-This is also called as short circuit operator, used as an alternative to if-else statement in jsx. The thing we need to make sure while using this kind of `expression` is that the left side
+This is also called as short-circuit operator, used as an alternative to if-else statement in jsx. The thing we need to make sure while using this kind of `expression` is that the left side
 of the `&&` always gets evaluated to a boolean value.
 For example, both of the below examples do the statement
 
@@ -183,6 +183,72 @@ When an react element is bound to an event handler, it propagates the event to t
 to the Javascript events while fixing some of the browser inconsistencies & including additional features. The real JS event can be accessed using `event.nativeEvent`.
 
 More on this from React docs: https://react.dev/reference/react-dom/components/common#react-event-object.
+
+## What is a variable?
+
+A label is assigned to data saved in memory - variable.
+
+- `const`- the variable pointing to the data is locked.
+- `let` - variable can be pointed to different data in memory (re-assignment)
+
+For `const`, although its link to data is locked, the data itself can be modified (mutation) as long as the data is non-primitive.
+
+primitive data types - boolean, string, number, bigint, undefined, symbol, null.
+
+non primitive data types - objects (function), array.
+
+## truthy & falsy values
+
+Falsy values in JS:
+
+- false
+- null
+- undefined
+- '' (empty string)
+- 0 (or 0.0, -0)
+- NaN
+
+Everything else is truthy.
+
+## Dynamic key generation
+
+When we render a list of something, each item in the list is expected to have unique key. React uses these keys to keep track of each items of the list. This unique key can't be the index of the item as
+the index may change if the list is modified. Its not a good idea of use `Math.random()` as the key value because if you add a new item to the list, which re-renders the page assigning new key values to each item by running
+`Math.random()`. So, the better way is to inject the key value as either `Math.random()` or `crypto.randomUUID()` to the item object when it gets created rather than when it gets rendered.
+
+## Why you should not mutate non-primitives during state updates?
+
+When you set state in react, it will re-render only if the value has changed? No, react compares the current value & previous value using referential equality (think about const image).
+If the value has same reference, it won't re-render. If it has new reference it will re-render.
+
+Primitive values are immutable, so when you set state, the state has a new value with new reference, so there is a re-render. Whereas non-primitive values are mutable, so when you set state,
+the value should not be mutated, instead set a new value to the state. This way a new reference gets created for that state value and re-render occurs.
+
+For an array:
+
+- create a new array.
+- insert the old one into the new one.
+- modify the new array as required for the state change.
+- set this new array as new state (update the state using the new array).
+
+## Why should we wrap a form inside a `<form>` tag?
+
+Otherwise, we cant listen to onSubmit events. A user may click Enter key instead of clicking the submit button using a mouse. The `form` tag automatically listens to the form submissions which may be done by either clicking the button
+or pressing the enter key in the keyboard.
+
+We need to prevent default behavior of the form submissions when `onSubmit` event is triggered. This is because the form tries to redirect the user to a new URL specified in the action attribute. If the attribute is not set,
+it'll reload the page. To stop this from happening, we stop the default behavior because when a form is submitted, we want to either make an API call or change some state. So, we use `event.preventDefault()` inside the
+`onSubmit` event handler.
+
+## Component & component instances
+
+A component is a re-usable UI element. For example, we may build a button component that can be used in multiple scenarios throughout an application. If a component is used in multiple places or scenarios, each time a new
+long running object gets created storing contextual information about that particular component. So each component render is called component instance.
+
+## State updates are asynchronous.
+
+Each state updates are asynchronous. If multiple state updates are there, each get batched and gets executed asynchronously. This is done to reduce the load on the system, which could render multiple times each time a state gets
+updated. There may be situations where we need other states to be updated along with current one or there are dependent state updates. For all these situations, asynchronous state updates come in handy.
 
 ---
 
