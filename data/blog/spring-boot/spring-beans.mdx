@@ -1,7 +1,7 @@
 ---
 title: 'Spring beans'
 date: '2024-02-10'
-lastmod: '2024-03-16'
+lastmod: '2024-08-23'
 tags: ['java', 'spring']
 summary: 'A definitive theory of beans in Spring'
 ---
@@ -57,13 +57,24 @@ A scope can be defined for a bean, which can control how a bean is used while cr
 
 ### Singleton (default scope)
 
+```java
+@Scope(BeanDefinition.SCOPE_SINGLETON)
+```
+
 When a bean is singleton scoped, only one instance of it is created. So, if the same bean is requested in multiple places, the same instance of the bean is returned.
-In other words, if the bean value is modified in one place, the value gets modified in all other places where the bean is being used.
+In other words, if the bean value is modified in one place, the value gets modified in all other places where the bean is being used. Single bean could cause problem in multithreading as same bean
+instance could be accessed by multiple threads, causing `Race Condition` - so the beans should be immutable (use final).
 
 ### Prototype
 
+```java
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+```
+
 This scope is opposite of singleton scope. So, every time a prototype bean is requested by the container (using the `getBean()` method) a new instance of the bean is created and returned.
 The IoC container doesn't entirely manage the prototype scoped bean, it only initializes and configures it. So, its up to the client to clean up any expensive resources used for this bean. This can be accomplished by using `BeanPostProcessor` which holds reference to the bean. This processor can also be used for many other purposes when we want to customize how Spring manages a bean.
+
+This scope is rarely used and its used if the bean frequently changes its state of data resulting in `Race Condition`.
 
 ### Request (web aware only)
 
@@ -153,6 +164,10 @@ There are 2 spring boot annotations that can,
 More about these 2 annotations explained [here](./spring-boot-essentials-annotations-1#postconstruct-vs-predestroy-annotation).
 
 ---
+
+## Appendix
+
+**Race condition** - 2 or more threads try to access/modify same resource(s) leading to discrepancies in the final result of the modification.
 
 ## Sources
 
