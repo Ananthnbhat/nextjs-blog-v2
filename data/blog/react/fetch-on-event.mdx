@@ -1,0 +1,98 @@
+---
+title: 'Make an API call onSubmit'
+date: '2024-09-08'
+lastmod: '2024-09-08'
+tags: ['react', 'snippet']
+# layout: ListLayout
+summary: 'Brief and standard way to make an API call on submitting a form in React.'
+---
+
+<TOCInline toc={props.toc} exclude="Overview" />
+
+## TL;DR
+
+```jsx
+import React from 'react'
+
+const ContactForm = () => {
+  const [email, setEmail] = React.useState('')
+  const [message, setMessage] = React.useState('')
+
+  const [status, setStatus] = useState('idle')
+
+  const id = React.useId()
+  const emailId = `${id}-email`
+  const messageId = `${id}-message`
+
+  async function handleSubmit(event) {
+    event.preventDefault()
+    // set status where & when necessary
+    setStatus('loading')
+
+    // await fetch
+    const response = await fetch('https://jor-test-api.vercel.app/api/contact', {
+      method: 'POST',
+      body: JSON.stringify({
+        email,
+        message,
+      }),
+    })
+
+    // use try catch to handle 5xx errors
+    // await fetch response.json()
+    const json = await response.json()
+    // check json.ok
+    try {
+      if (json.ok) {
+        // true?
+        setStatus('success')
+        setMessage('')
+      } else {
+        setStatus('error')
+      }
+    } catch (error) {
+      setStatus('error')
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <div className="row">
+        <label htmlFor={emailId}>Email</label>
+        <input
+          id={emailId}
+          type="email"
+          value={email}
+          required={true}
+          disabled={status === 'loading'}
+          onChange={(event) => setEmail(event.target.vale)}
+        />
+      </div>
+      <div className="row">
+        <label htmlFor={messageId}>Message</label>
+        <input
+          id={messageId}
+          type="text"
+          value={message}
+          required={true}
+          disabled={status === 'loading'}
+          onChange={(event) => setMessage(event.target.vale)}
+        />
+      </div>
+      <div className="button-row">
+        <button disabled={status === 'loading'}>
+          {status === 'loading' ? 'Submitting...' : 'Submit'}
+        </button>
+      </div>
+      {status === 'success' && <p>Submit successful!</p>}
+      {status === 'error' && <p>Submit failed, something went wrong!</p>}
+    </form>
+  )
+}
+```
+
+---
+
+## Sources
+
+- [joyofreact](https://joyofreact.com).
