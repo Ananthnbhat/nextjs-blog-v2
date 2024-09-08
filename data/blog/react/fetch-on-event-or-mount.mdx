@@ -1,15 +1,15 @@
 ---
-title: 'Make an API call onSubmit'
+title: 'Make an API call in React'
 date: '2024-09-08'
 lastmod: '2024-09-08'
-tags: ['react', 'snippet']
+tags: ['react']
 # layout: ListLayout
-summary: 'Brief and standard way to make an API call on submitting a form in React.'
+summary: 'Make an API call using fetch in different scenarios'
 ---
 
 <TOCInline toc={props.toc} exclude="Overview" />
 
-## TL;DR
+## `On submitting` a form
 
 ```jsx
 import React from 'react'
@@ -91,8 +91,51 @@ const ContactForm = () => {
 }
 ```
 
+## Use SWR to fetch `on mount` (stale-while-revalidate)
+
+SWR, by design, shows the stale data while fetching the latest data (revalidating).
+
+```jsx
+import React from 'react'
+import useSWR from 'swr'
+
+const ENDPOINT = 'https://jor-test-api.vercel.app/api/get-temperature?simulatedError=true'
+
+async function fetchFunc(url) {
+  const response = await fetch(url)
+  const json = await response.json()
+
+  // swr expects an error (or an object) to be thrown if there is an error (unlike prev example)
+  if (!json.ok) {
+    throw json
+  }
+
+  return json
+}
+
+const App = () => {
+  const { data, isLoading, error } = useSWR(ENDPOINT, fetchFunc)
+
+  if (isLoading) {
+    return <p>Loading...</p>
+  }
+
+  if (error) {
+    return <p>Something went wrong!</p>
+  }
+
+  return (
+    <p>
+      Current temperature:
+      {typeof data?.temperature === 'number' && <span>{data.temperature}°C</span>}
+    </p>
+  )
+}
+```
+
 ---
 
 ## Sources
 
-- [joyofreact](https://joyofreact.com).
+- [joyofreact](https://joyofreact.com)
+- [useSWR](https://swr.vercel.app/)
