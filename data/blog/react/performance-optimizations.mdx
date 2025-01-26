@@ -1,8 +1,50 @@
 ---
-title: 'Performance optimizations (draft)'
+title: 'Performance optimizations'
 tags: ['react']
-date: '1970-01-01'
+date: '2025-01-23'
+lastmod: '2024-01-26'
 summary: 'Ways to optimize performance in react apps'
 ---
 
-under development...
+<TOCInline toc={props.toc} exclude="Overview" />
+
+# Memoization
+
+Memoization is caching mechanism which saves output of a expensive calculation, definition of a function or a component.
+This caching is revalidated only if the given dependency params are updated.
+
+### [memo()](https://react.dev/reference/react/memo)
+
+This is used to implement a `Pure Component` where a component always returns same UI when its props are same.
+So, only way to re-render this component is by passing new props or its state changes. It doesn't re-render when its parent's
+state is updated.
+
+### [useMemo()](https://react.dev/reference/react/useMemo)
+
+This is a React hook which is used to cache the output of a an expensive calculation, so that this calculation doesn't
+need to happen during every re-render. This cache is revalidated if any dependency is updated.
+
+### [useCallback()](https://react.dev/reference/react/useCallback)
+
+This is a React hook which is used to cache/store the definition of a function. So, it always produces the same output
+for given props. This cache is revalidated if any dependency is updated.
+
+Consider a scenario where a parent passes a function as prop to a [Pure component](#memo). We expect the pure component not to re-render when the parent re-renders but it does. This is because functions, like arrays or objects, are equated by
+reference, not by value. So, every time the parent re-renders, it's creating a new function and passing it to the child. In this scenario, it is recommended to wrap this function prop with `useCallback`, so that
+parent's re-render doesn't create a new function and hence the child gets the same prop, preventing its re-render.
+
+# Suspense and lazy loading.
+
+This topic is covered [in this page](./react-suspense)
+
+# Lazy loading images
+
+Loading images lazily when it appears on the viewport (user's visible area of a web page) can speed of page load. We can simply use packages like [react-lazyload](https://www.npmjs.com/package/react-lazyload) or [react-lazy-load-image-component](https://www.npmjs.com/package/react-lazy-load-image-component)
+to achieve this. If you are using a React framework like [Next.js](https://nextjs.org/docs/pages/building-your-application/optimizing/images), it supports image lazy loading by default.
+
+---
+
+Its recommended in [Kent's blog](https://kentcdodds.com/blog/usememo-and-usecallback) not to optimize performance using above technique unless absolutely necessary as these techniques introduce complexities of their own and are not always necessary because React optimizes most of the stuff on its own.
+So, its better to measure the performance in a **_production build_** before optimizing it.
+
+On the other end of the spectrum, in [Stefano's blog](https://attardi.org/why-we-memo-all-the-things/), he says there is no problem memoizing everything.

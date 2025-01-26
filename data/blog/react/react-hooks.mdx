@@ -1,0 +1,37 @@
+---
+title: 'React hooks'
+date: '2025-01-26'
+lastmod: '2025-01-26'
+tags: ['react']
+# layout: ListLayout
+summary: 'Some react hooks and when to use them'
+---
+
+<TOCInline toc={props.toc} exclude="Overview" />
+
+## What is a react hook?
+
+A react hook is a reusable javascript function or method with special rules associated with it.
+
+- Hook name should start with `use`.
+- A hook should be called at the top level of the component or the function.
+- A hook must be called inside a function component, not a class component.
+
+There are react provided hooks and custom hooks that a dev can implement. A custom hook can call other hooks.
+
+Some of the most commonly used React provided hooks are,
+
+- `useState`: holds & tracks state for the component.
+- `useReducer`: holds multiple states and provides feature to update them using reducer functions.
+- `useEffect`: can perform side effects such as state changes, API calls and more.
+- `useMemo`: for performance improvement: can cache the output of a function or a expensive computation.
+- `useCallback`: for performance improvement: can cache the definition of a function - skips re-rendering of the function.
+- `useContext`: for global state management: can pass data from distant component/parent to a leaf node/component.
+- `useRef`: mostly used to hold a DOM node and perform actions on it. Preserves the value between re-renders.
+
+---
+
+## Sources
+
+- [Built-in React hooks](https://react.dev/reference/react/hooks)
+- [rules of hook](https://react.dev/reference/rules/rules-of-hooks)
