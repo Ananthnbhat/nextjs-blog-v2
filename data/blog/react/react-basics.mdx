@@ -180,9 +180,9 @@ Not all re-renders require re-painting. If nothing has changed between snapshots
 
 ## What triggers re-rendering?
 
-Only a state change can trigger a re-rendering in the component where the state has changed + its descendants. It's possible to
+Only a state change can trigger a re-rendering in the component where the state has changed -> this also re-renders its descendants. It's possible to
 prevent re-rendering of a descendant component, if its unnecessary, by making it [**Pure**](./performance-optimizations#memo) using `React.memo(XyzComponent)`.
-This is one of the performance improvement techniques called `Memoization` of component.
+This is one of the performance improvement techniques called [`Memoization`](./performance-optimizations) of component.
 
 ## Synthetic events in React
 
