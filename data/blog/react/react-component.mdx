@@ -1,0 +1,127 @@
+---
+title: 'React component tips (draft)'
+tags: ['react']
+date: '2025-01-27'
+lastmod: '2024-01-27'
+summary: 'Tips and tricks while using react components'
+---
+
+<TOCInline toc={props.toc} exclude="Overview" />
+
+## Prop delegation
+
+When we need to pass multiple props through multiple component or children, we can use the spread operator to pass them on instead of passing them individually.
+For example,
+
+```jsx
+function LoggedInBanner({
+  user,
+  // all unspecified props:
+  ...delegated
+}) {
+  if (!user || user.registrationStatus === 'unverified') {
+    return null
+  }
+
+  // And pass them onto Banner:
+  return <Banner {...delegated} />
+}
+```
+
+Similarly, below 3 code snippets are same
+
+```jsx
+// This code:
+<Banner {...delegated} />
+
+// ...is same as:
+<Banner type={delegated.type} children={delegated.children} />
+
+
+// ...which is the same as:
+<Banner type={delegated.type}>{delegated.children}</Banner>
+```
+
+> We have to remember that this delegated prop should be last prop as we cannot add comma after it
+
+This delegation technique also helps whoever is using the component to provide additional props which are not necessarily defined by the original developer. For example,
+
+```jsx
+function Checkbox({ label, ...delegated }) {
+  const id = React.useId()
+
+  return (
+    <>
+      <label htmlFor={id}>{label}</label>
+      <input id={id} type="checkbox" {...delegated} />
+    </>
+  )
+}
+```
+
+But an interesting situation with above component is that it can be used like below, which overrides the main use of the input component as a checkbox, leading to bugs
+
+```jsx
+<Checkbox label="Do you agree to the terms?" type="button" onClick={handleAgreeToTerms} />
+```
+
+So, we can avoid this situation by enforcing some props as non-overridable like so,
+
+```jsx
+function Checkbox({ label, ...delegated }) {
+  const id = React.useId()
+
+  return (
+    <>
+      <label htmlFor={id}>{label}</label>
+      <input {...delegated} id={id} type="checkbox" />
+    </>
+  )
+}
+```
+
+So, based on the component a decision needs to be made to how much control do we give the user of the component to override,
+
+- If we want the component to be overridable, place `{...delegated}` as the last prop.
+- If we want the component NOT to be overridable, place `{...delegated}` as the first prop.
+
+This concept can be applied to styling component,
+
+1. If we want the component's style to be overridable, let `className` to be overridden.
+
+```jsx
+// sliderClassName can be a prop accepted by the component which allows className to be custom one.
+<input {...delegated} type="range" id={id} className={sliderClassName || defaultStyling} />
+```
+
+2. If we want the component NOT to be overridable, specify which styling properties can be overridden.
+
+```jsx
+<input
+  {...delegated}
+  type="range"
+  id={id}
+  className={styles.slider}
+  style={{
+    '--handle-size': handleSize,
+    '--handle-color': handleColor,
+    '--handle-active-color': handleActiveColor,
+  }}
+/>
+```
+
+## Forwarding ref
+
+## Polymorphism in React
+
+## Compound components
+
+## Context
+
+## Modal
+
+---
+
+## Sources
+
+- [joyofreact.com](https://joyofreact.com).
