@@ -110,7 +110,72 @@ This concept can be applied to styling component,
 />
 ```
 
-## Forwarding ref
+## Using ref
+
+From React 19, we can use the `ref` property to pass the reference of a DOM node from child component to the parent component.
+
+### What is `ref` and `useRef`?
+
+The `useRef` hooks is used to hold a value that is not used for any UI rendering. So, if there is a re-render,
+the value stored using the useRef remains the same and is not re-rendered.
+
+```jsx:useRefExample.jsx
+// initial value of ref is 0
+const ref = React.useRef(1)
+
+// current value of the ref can be re-assigned and this doesn't trigger a re-render
+ref.current = ref.current + 1
+
+console.log(ref.current) // prints 2
+```
+
+`ref` property can be used along with `useRef` React hook to access and action on a DOM node.
+
+```jsx:refExample.jsx
+// 1. initialize a ref with null value
+const myRef = useRef(null);
+
+// 3. use the ref to bring focus to the input on component mount
+useEffect(() => {
+    inputRef.current.focus();
+  }, [])
+
+// 2. assign myRef to a ref property of a node.
+<input type="text" value="input value" ref={myRef} />
+```
+
+### Forwarding ref
+
+```jsx:refForwardingExample.jsx
+import { useRef } from 'react';
+const ParentComponent = () => {
+
+  // 1. create ref here
+  const inputRef = useRef(null)
+
+  const handleClick = () => {
+    // 4. this will focus the input in the child component
+    inputRef.current.focus()
+  }
+
+
+  return(
+    // 2. Pass it to a child component
+    <>
+      <ChildInputComponent refToPass={inputRef} />
+      <button onClick={handleClick}>Focus input</button>
+    </>
+
+  )
+
+  const ChildInputComponent = ({ refToPass }) => {
+    return(
+      // 3. assign ref to a built in component like <input />
+      <input type="text" ref={refToPass} >
+    )
+  }
+}
+```
 
 ## Polymorphism in React
 
@@ -125,3 +190,5 @@ This concept can be applied to styling component,
 ## Sources
 
 - [joyofreact.com](https://joyofreact.com).
+- [Manipulating DOM with ref](https://react.dev/learn/manipulating-the-dom-with-refs)
+- [Built in components in React](https://react.dev/reference/react-dom/components/common)
