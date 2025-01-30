@@ -179,6 +179,136 @@ const ParentComponent = () => {
 
 ## Polymorphism in React
 
+When we need to dynamically use an html tag based on the condition, then this technique is helpful.
+
+```js:App.js
+import React from 'react';
+
+import List from './List'
+
+function App() {
+  return (
+    <main>
+      <List>
+        <li>Item 1</li>
+        <li>Item 2</li>
+        <li>Item 3</li>
+      </List>
+      <List as="ol">
+        <li>Item 1</li>
+        <li>Item 2</li>
+        <li>Item 3</li>
+      </List>
+    </main>
+  );
+}
+
+export default App;
+```
+
+```js:List.js
+import React from 'react';
+
+import styles from './List.module.css';
+
+const VALID_TAGS = ['ul', 'ol'];
+
+function List({
+  // ol | ul
+  as: Tag = 'ul',
+  className = '',
+  children,
+  ...delegated
+}) {
+  if (!VALID_TAGS.includes(Tag)) {
+    throw new Error(
+      `Unrecognized tag: ${Tag}. Expected: ${VALID_TAGS}`
+    );
+  }
+
+  return (
+    <Tag
+      {...delegated}
+      className={`${styles.wrapper} ${className}`}
+    >
+      {children}
+    </Tag>
+  );
+}
+
+export default List;
+```
+
+The above example is taken from [joyofreact.com](https://joyofreact.com) course as it helps explain the concept perfectly.
+In this example, we make the `List` component dynamic by assigning the `Tag` component either `ul` or `ol` based on the `as` parameter. This is broadly usable if there are more than 2
+possible valid tags for Tag component.
+
+Another simpler alternative would be,
+
+```js:List.js
+function List({
+  ordered,
+  className = '',
+  children,
+  ...delegated
+}) {
+  // only 1 out of 2 value for Tag in this example.
+  const Tag = ordered ? 'ol' : 'ul'
+
+  return (
+    <Tag
+      {...delegated}
+      className={`${styles.wrapper} ${className}`}
+    >
+      {children}
+    </Tag>
+  );
+}
+```
+
+In the above example, we just use a ternary operator to determine what `Tag` should be based on whether ordered is passed in as true or false.
+
+This works because the Tag component results in a string, i.e., from above example, it will be either 'ul' or 'ol'. And this is how a [react element]('./react-basics#what-is-a-react-element') understands about what needs to be rendered.
+
+```jsx:example.jsx
+// This code:
+React.createElement(
+  Tag,
+  {
+    href,
+    className: styles.button,
+    ...delegated
+  },
+  children
+);
+
+// Is the same as this code:
+<Tag
+  href={href}
+  className={styles.button}
+  {...delegated}
+>
+  {children}
+</Tag>
+```
+
+In the above code, the Tag gets converted to 'ul' or 'ol',
+
+```jsx:example.jsx
+React.createElement(
+  'ol',
+  {
+    href,
+    className: styles.button,
+    ...delegated
+  },
+  children
+);
+
+```
+
+> This method can be used when the Tag component results in a HTML tag such as a,p,span etc., not a React component.
+
 ## Compound components
 
 ## Context
