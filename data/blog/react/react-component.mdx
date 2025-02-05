@@ -311,6 +311,88 @@ React.createElement(
 
 ## Compound components
 
+Compound components is where multiple components are combined together because they are dependent on each
+other while sharing logic and state. One of the primitive examples of this pattern is the `<select />` tag which is used together
+with the `<option />` tag.
+
+In React, many libraries and frameworks use this pattern to reduce imports in a component. For example,
+
+```jsx
+// Example from React Bootstrap
+import Dropdown from 'react-bootstrap/Dropdown'
+
+function UserButton() {
+  return (
+    <Dropdown>
+      <Dropdown.Toggle>Actions</Dropdown.Toggle>
+
+      <Dropdown.Menu>
+        <Dropdown.Item href="/change-email">Change Email</Dropdown.Item>
+        <Dropdown.Item href="/reset-pwd">Reset Password</Dropdown.Item>
+        <Dropdown.Item href="/delete">Delete account</Dropdown.Item>
+      </Dropdown.Menu>
+    </Dropdown>
+  )
+}
+```
+
+This works because like everything in javascript, functions are also objects. So, functions can have properties, for example,
+
+```jsx
+function someFunc(a, b) {
+  return a + b
+}
+someFunc.label = 'someFunc has label property'
+console.log(someFunc.label) // "someFunc has label property"
+```
+
+Similarly, from the 1st example of `<Dropdown />`, gets property called Toggle (& Menu and Item) assigned to it as shown below,
+
+```js:Dropdown.js
+function Dropdown({children}){
+  return <>{children}</>
+}
+function DropdownToggle({ children }) {
+  return (
+    <button>{children}</button>
+  );
+}
+
+Dropdown.Toggle = DropdownToggle;
+
+export default Dropdown;
+```
+
+An alternative approach which avoids this pattern is by exporting each component separately instead of assigning them as properties to the main component,
+
+```js:Dropdown.js
+function Dropdown({ children }) {
+  return (
+    <div>{children}</div>
+  );
+}
+
+export function DropdownToggle({ children }) {
+  return (
+    <button>{children}</button>
+  );
+}
+
+export default Dropdown;
+```
+
+If we use this alternate method, then we'd have to import them individually instead of importing just one big component,
+
+```jsx
+import Dropdown, { DropdownToggle } from 'library/Dropdown'
+```
+
+The advantage of this method is,
+
+- optimizations like tree shaking will work.
+- compatible with any react frameworks like Next js.
+- more readable.
+
 ## Context
 
 ## Modal
@@ -322,3 +404,4 @@ React.createElement(
 - [joyofreact.com](https://joyofreact.com).
 - [Manipulating DOM with ref](https://react.dev/learn/manipulating-the-dom-with-refs)
 - [Built in components in React](https://react.dev/reference/react-dom/components/common)
+- [patterns.dev](https://www.patterns.dev/react/compound-pattern/)
