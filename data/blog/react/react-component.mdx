@@ -501,12 +501,36 @@ const App = () => {
 
 ## Modal
 
+A modal is a window that pops up in front of the main content. It requires the user to interact with it before they can return to the main content.
+It is a good idea to create a separate component for the modal, so that it can be reused in different parts of the application.
+
+A Dialog is a modal that is used when we need some user input.
+A tool tip is a modal that is used to show some information when the user hovers over an element.
+A popup is a modal that is used to show some information without blocking other interactions.
+
+Some of the non-exhaustive accessibility requirements when building a modal are:
+
+- The modal should be able to be closed by clicking outside of it.
+- The modal should be able to be closed by pressing the escape key.
+- The modal should be able to be closed by clicking on a close button.
+- The modal should be able to be closed by clicking on a cancel button.
+- The modal should be able to be closed by clicking on a submit button.
+- The focus should be trapped inside the modal when it is open.
+- Being able to focus on the first focusable element in the modal when it is open, which could be the close button or the first input element.
+- Focusing on the last focused element when the modal is closed.
+- People using screen readers should be made aware that the modal is open by setting a title to the modal.
+
+An example is taken from [joyofreact.com](https://joyofreact.com) course - [modal sandbox](https://codesandbox.io/p/devbox/still-sound-n4n2s5?workspaceId=ws_TjZrMChQgcYVTboVtKvEVn).
+
+Another example of a modal built using <dialog /> tag is shown here in the MDN website which uses a CSS pseudo class to style it - [modal in MDN website](https://developer.mozilla.org/en-US/docs/Web/CSS/:modal).
+
 ---
 
 ## References
 
-- [joyofreact.com](https://joyofreact.com).
+- [joyofreact.com](https://joyofreact.com)
 - [Manipulating DOM with ref](https://react.dev/learn/manipulating-the-dom-with-refs)
 - [Built in components in React](https://react.dev/reference/react-dom/components/common)
 - [patterns.dev](https://www.patterns.dev/react/compound-pattern/)
 - [use hook](https://react.dev/reference/react/use)
+- [modal using dialog tag](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dialog)
