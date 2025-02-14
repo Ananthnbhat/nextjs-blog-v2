@@ -395,6 +395,110 @@ The advantage of this method is,
 
 ## Context
 
+The main way to pass the data from one component to another is through props. This is not ideal approach if we need to pass it through multiple components or
+to a far away component. This can also mean the data gets passed along through components which don't even need it. Over time, it becomes to hard to maintain
+all the components.
+
+Context helps with this problem by exposing the state or data to all the children components, which can be the whole application, and it can be accessed only by importing it.
+Its really a JS object, that can store values. The `Provider` component that helps us broadcast or distribute the data stored in the context.
+
+#### Syntax
+
+1. First we create the context and add a `Provider` property to make the data available to whatever imports it.
+
+```js:App.js
+import React from 'react';
+import RealApp from './RealApp';
+
+export const ThemeContext = React.createContext();
+
+const App = () => {
+  const [theme, setTheme] = React.useState('light');
+
+  return (
+    // if you need to pass only 1 value - <ThemeContext.Provider value={theme}>
+    <ThemeContext.Provider value={{theme, setTheme}}>
+      <RealApp />
+    </ThemeContext.Provider>
+  )
+}
+```
+
+> From React 19, the context object itself acts as a provider. So, it can be omitted. But both work nonetheless.
+> The [use](https://react.dev/reference/react/use) hook can be used instead of `useContext`. This hook is used to pluck the data from Context or ,in some cases, a Promise.
+
+```js:App.js
+import React from 'react';
+import RealApp from './RealApp';
+
+export const ThemeContext = React.createContext();
+
+const App = () => {
+  const [theme, setTheme] = React.useState('light');
+
+  return (
+    // This is the modern approach
+    <ThemeContext value={{theme, setTheme}}>
+      <RealApp />
+    </ThemeContext>
+  )
+}
+```
+
+2. Then we import the context and use it using the `useContext` hook. The useContext hook retrieves the data in the
+   context, and plugs it into RealApp component, which is being broadcasted by the context provider built-in.
+
+```js:RealApp.js
+import React from 'react';
+import {ThemeContext} from './App.js'
+
+const RealApp = () => {
+  const {theme, setTheme} = React.useContext(ThemeContext);
+
+  return (
+    <>
+      <button onClick={() => setTheme('dark')}>Change theme</button>
+      <Dashboard theme={theme} />
+    </>
+  )
+}
+```
+
+#### Refactors
+
+It is better to create separate context providers based on the data being shared. For example, if we want to
+make the `user` object available through context, then we should create a new context provider instead of creating a merged provider
+for `theme` & `user`. This improves readability, performance in some situations.
+
+It is also a good idea to create a new component solely for defining the context provider. This move de-clutters the
+`App.js` if there is lot of code involved with a particular context provider.
+
+If a [Pure component](./performance-optimizations#memo) is using a context, it will re-render if the context provider re-renders
+without changing the value in the context. This defeats the purpose of the pure component, so the context provider should be
+memoized, so it only re-renders if the context value changes:
+
+```js:App.js
+import React from 'react';
+import RealApp from './RealApp';
+
+export const ThemeContext = React.createContext();
+
+const App = () => {
+  const [theme, setTheme] = React.useState('light');
+
+// memoized values shared through Context.
+  const themeValues = React.useMemo(() => {
+    return {theme, setTheme};
+  }, [theme]);
+
+  return (
+    <ThemeContext.Provider value={themeValues}>
+      <RealApp />
+    </ThemeContext.Provider>
+  )
+}
+```
+
 ## Modal
 
 ---
@@ -405,3 +509,4 @@ The advantage of this method is,
 - [Manipulating DOM with ref](https://react.dev/learn/manipulating-the-dom-with-refs)
 - [Built in components in React](https://react.dev/reference/react-dom/components/common)
 - [patterns.dev](https://www.patterns.dev/react/compound-pattern/)
+- [use hook](https://react.dev/reference/react/use)

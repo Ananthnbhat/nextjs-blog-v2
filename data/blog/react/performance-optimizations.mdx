@@ -17,7 +17,10 @@ This caching is revalidated only if the given dependency params are updated.
 
 This is used to implement a `Pure Component` where a component always returns same UI when its props are same.
 So, only way to re-render this component is by passing new props or its state changes. It doesn't re-render when its parent's
-state is updated.
+state is updated. A pure component will only re-render if a prop, its state or the imported [Context](./react-component#context) value changes.
+So, if the context value changes (or the context provider re-renders), the pure component will re-render.
+
+It is a good idea to [memoize the Context provider](./react-component#refactors) to prevent it from re-generating a new value, which could re-render a pure component.
 
 ### [useMemo()](https://react.dev/reference/react/useMemo)
 
