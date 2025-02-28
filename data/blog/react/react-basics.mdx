@@ -180,9 +180,14 @@ Not all re-renders require re-painting. If nothing has changed between snapshots
 
 ## What triggers re-rendering?
 
-Only a state change can trigger a re-rendering in the component where the state has changed -> this also re-renders its descendants. It's possible to
+A state change can trigger a re-rendering in the component where the state has changed -> this also re-renders its descendants. It's possible to
 prevent re-rendering of a descendant component, if its unnecessary, by making it [**Pure**](./performance-optimizations#memo) using `React.memo(XyzComponent)`.
 This is one of the performance improvement techniques called [`Memoization`](./performance-optimizations) of component.
+
+If the parent component passes new props to the child component then the child component will re-render. It doesn't matter if the new props are same as the old props or not OR if the props are used in the output/return of the child component or not.
+To prevent this, we can use [`React.memo(XyzComponent)`](./performance-optimizations#memo) to make the child component pure.
+
+If a component is subscribed to a Context, then any change in the context value will trigger a re-render of the component.
 
 ## Synthetic events in React
 
@@ -250,7 +255,7 @@ it'll reload the page. To stop this from happening, we stop the default behavior
 ## Component & component instances
 
 A component is a re-usable UI element. For example, we may build a button component that can be used in multiple scenarios throughout an application. Each time a new component is created/used, its called as a component instance and a
-long running object gets created storing contextual information about it.
+long running object gets created storing contextual information about it. The component instance maintains the state of the component, the props passed to it, the context it is subscribed to, etc. independently.
 
 ## State updates are asynchronous.
 
