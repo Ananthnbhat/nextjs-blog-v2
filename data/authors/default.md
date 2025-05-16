@@ -9,4 +9,4 @@ linkedin: 'https://www.linkedin.com/in/ananthnbhat'
 facebook: 'https://www.facebook.com/profile.php?id=100010663382635'
 ---
 
-About me
+I'm a software engineer, part time musician and avid reader of all things suspense, action and adventure.
