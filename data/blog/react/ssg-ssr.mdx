@@ -1,8 +1,9 @@
 ---
 title: 'SSR vs SSG'
 date: '2022-02-02'
-tags: ['next js', 'rendering']
-summary: 'When to Use Static Site Generation v.s. Server Side Rendering'
+lastmod: '2025-05-16'
+tags: ['react', 'next js', 'rendering']
+summary: 'CSR, SSR and SSG'
 ---
 
 According to Next Js [docs](https://nextjs.org/learn/basics/data-fetching/two-forms), using **Static Generation** (with and without data) whenever possible is recommended, because your page can be built once and served by CDN, which makes it much faster than having a server render the page on every request.
@@ -24,14 +25,59 @@ In that case, you can use **Server-Side Rendering**. It will be slower, but the 
 
 Client Side Rendering is the traditional way of rendering a page in the browser. A user requests for a page and server sends all the resources & scripts to the browser, then a DOM tree is formed to create a HTML page IN the browser on the client side. The rendering process takes some time during which the user has to wait.
 
+In other words, the browser downloads the HTML page, then it downloads all the required scripts & resources, and finally it renders the page. This is a time consuming process and can lead to a blank screen for the user until the page is fully loaded.
+This is the reason why CSR is not recommended for pages that are frequently updated or have a lot of data to be displayed. It can lead to a poor user experience and can also affect the performance of the website.
+
 ## SSR
 
-SSR stands for Server Side Rendering. When a user sends a request through the browser, the server receives the request, generates a complete HTML site and returns it to the browser. So, the rendering happens in the server, not in the browser. While server is rendering(generating) the HTML page, a placeholder HTML (a loader animation) can be displayed to the user instead of showing a blank screen, which is what happens in Client Side Rendering.
+SSR stands for Server Side Rendering. When a user sends a request through the browser, the server receives the request, generates a complete HTML site and returns it to the browser. So, the rendering happens in the server, not in the browser. While server is rendering(generating) the HTML page, a placeholder HTML (a loader animation) can be displayed to the user instead of showing a blank screen. So, the blank screen is shown both in CSR & SSR, but in SSR, the blank screen is shown for a very short time. This is because the server is generating the HTML page and sending it to the browser, which is much faster than the browser generating the HTML page itself.
+
+In other words, when a page is requested by the browser -> server renders the application (html & css) -> sends it to the client (user can now see the page) -> load javascript & hydrates.
 
 Next.js supports SSR out of the box ([link](https://nextjs.org/docs/advanced-features/react-18/streaming)) whereas in React 18, it can be done with a combination of React.suspense & React.lazy ([link](https://reactjs.org/docs/react-api.html#reactsuspense))
 
 ## SSG
 
-SSG stands for Static Site Generation. It means that a static HTML page is created for every route of the website. So, when a page is displayed on the browser, it doesn't wait to download & parse all the required scripts & resources for the DOM tree. It just displays the HTML page. This makes the React js (or Next js) page looks like a simple HTML page leading to fast load time & higher performance.
+SSG stands for Static Site Generation, is a flavour of SSR. It means that a static HTML page is created for every route of the website. So, when a page is displayed on the browser, it doesn't wait to download & parse all the required scripts & resources for the DOM tree. It just displays the HTML page. This makes the React js (or Next js) page looks like a simple HTML page leading to fast load time & higher performance.
+
+In other words, all the pages are rendered (HTML & CSS) ahead of time in the server -> When a page is requested by the browser -> server sends already rendered page to client (rendering doesn't happen on-demand, it happens ahead of time) -> client loads javascript & hydrates.
 
 Amazing resource on rehydration issue which is related to SSR/SSG - [Josh Cameau's blog](https://www.joshwcomeau.com/react/the-perils-of-rehydration/)
+.
+An issue with SSG is as mentioned in the above blog is that, the rendering done by the server is not always the same as the hydration done by the browser. This can lead to a mismatch between the server rendered page and the client hydrated page, which can cause issues with hydration. This is called `hydration mismatch` and can be a problem when using SSG. This can happen if there is some content that we are showing based on the dynamic data, which is not available at the time of rendering at the server side.
+
+One solution to this problem is to use `useEffect` to show/hide the page content that is dynamically generated (as shown below). This way, the server rendered page and the client hydrated page will be the same, and there will be no mismatch.
+
+```javascript
+function SomeComponent() {
+  // create a flag to check if the component has mounted
+  const [hasMounted, setHasMounted] = React.useState(false)
+
+  React.useEffect(() => {
+    // set the flag to true when the component has mounted, causing a re-render and showing the content (hydration)
+    setHasMounted(true)
+  }, [])
+
+  if (!hasMounted) {
+    // if the component has not mounted, return null/empty page
+    return null
+  }
+
+  const user = getUser()
+
+  if (user) {
+    return <AuthenticatedNav user={user} />
+  }
+  // This is shown to the user only after the component has mounted.
+  return (
+    <nav>
+      <a href="/login">Login</a>
+    </nav>
+  )
+}
+```
+
+Because this component basically returns `null` until the component has mounted, the server rendered page and the client hydrated page will be the same (both versions dont show this component). This way, there will be no mismatch between the server rendered page and the client hydrated page.
+This is a good solution, but it can lead to a poor user experience because the user will see a blank screen until the component has mounted.
+
+Another drawback of SSG is that the page is generated at build time, so if the data changes, the page will not be updated until the next build. This is not a problem for static pages, but for dynamic pages, it can be a problem.
